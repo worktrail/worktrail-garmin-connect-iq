@@ -31,7 +31,7 @@ class Status {
     }
 }
 
-class CommExample extends App.AppBase {
+class WorkTrailApp extends App.AppBase {
 
     function initialize() {
         App.AppBase.initialize();
