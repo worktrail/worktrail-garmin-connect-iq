@@ -1,0 +1,6 @@
+<resources>
+    <bitmaps>
+        <bitmap id="id_monkey" filename="images/monkey.png" />
+        <bitmap id="id_worktraillogo" filename="images/worktraillogo.png" />
+    </bitmaps>
+</resources>
