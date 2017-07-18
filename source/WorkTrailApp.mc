@@ -1,8 +1,3 @@
-//
-// Copyright 2015-2016 by Garmin Ltd. or its subsidiaries.
-// Subject to Garmin SDK License Agreement and Wearables
-// Application Developer Agreement.
-//
 
 using Toybox.Application as App;
 using Toybox.Communications as Comm;
@@ -55,7 +50,7 @@ class WorkTrailApp extends App.AppBase {
 
     // Return the initial view of your application here
     function getInitialView() {
-        return [new CommView(), new CommInputDelegate()];
+        return [new WorkTrailView(), new CommInputDelegate()];
     }
 
     function onMail(mailIter) {
