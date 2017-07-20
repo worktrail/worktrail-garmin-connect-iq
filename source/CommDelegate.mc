@@ -17,7 +17,24 @@ class CommListener extends Comm.ConnectionListener {
     }
 }
 
+class ConfirmationDialogDelegate extends Ui.ConfirmationDelegate {
+    function initialize() {
+        ConfirmationDelegate.initialize();
+    }
+    
+    function onResponse(value) {
+        if (value == 0) {
+            System.println("User cancelled. nothing to do.");
+        } else {
+            System.println("User wants to quit.");
+            Ui.popView(Ui.SLIDE_RIGHT);
+        }
+    }
+}
+
 class CommInputDelegate extends Ui.BehaviorDelegate {
+    var listener = new CommListener();
+
     function initialize() {
         Ui.BehaviorDelegate.initialize();
     }
@@ -37,15 +54,33 @@ class CommInputDelegate extends Ui.BehaviorDelegate {
         // Detect Menu button input
     function onKey(keyEvent) {
         System.println(keyEvent.getKey()); // e.g. KEY_MENU = 7
+        if (event.getKey() == Ui.KEY_ENTER) {
+            if (status.isCurrent) {
+                if (status.isWorking && !status.taskIsBreak) {
+                    Comm.transmit({"action" => "stop"}, null, listener);
+                } else {
+                    Comm.transmit({"action" => "start"}, null, listener);
+                }
+            }
+        }
     }
 
     function onTap(event) {
-        if(page == 0) {
-            page = 1;
-        } else {
-            page = 0;
-        }
+        System.println("Tapped.");
         Ui.requestUpdate();
+    }
+    
+    function onBack() {
+        System.println("Back pressed.");
+        if (status.isCurrent) {
+            if (status.isWorking) {
+                Comm.transmit({"action" => "start_break"}, null, listener);
+                return true;
+            }
+        }
+        var dialog = new Ui.Confirmation("Quit App?");
+        Ui.pushView(dialog, new ConfirmationDialogDelegate(), Ui.SLIDE_IMMEDIATE);
+        return true;
     }
 }
 

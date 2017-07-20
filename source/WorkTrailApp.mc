@@ -4,9 +4,6 @@ using Toybox.Communications as Comm;
 using Toybox.WatchUi as Ui;
 using Toybox.System as Sys;
 
-var page = 0;
-var strings = ["","","","",""];
-var stringsSize = 5;
 var mailMethod;
 var phoneMethod;
 var crashOnMessage = false;
@@ -14,11 +11,13 @@ var crashOnMessage = false;
 var status = new Status();
 
 class Status {
+    var isCurrent = false;
     var taskName = null;
     var taskIsBreak = false;
     var isWorking = false;
     
     function updateFromStatus(status) {
+        isCurrent = true;
         taskName = status["task_name"];
         taskIsBreak = status["task_is_break"];
         isWorking = status["working"];
@@ -76,16 +75,6 @@ class WorkTrailApp extends App.AppBase {
         var i;
         
         status.updateFromStatus(msg.data);
-
-        if((crashOnMessage == true) && msg.data.equals("Hi")) {
-            foo = bar;
-        }
-
-        for(i = (stringsSize - 1); i > 0; i -= 1) {
-            strings[i] = strings[i-1];
-        }
-        strings[0] = msg.data.toString();
-        page = 1;
 
         Ui.requestUpdate();
     }
