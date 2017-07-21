@@ -37,6 +37,7 @@ class WorkTrailApp extends App.AppBase {
         } else {
             Comm.setMailboxListener(mailMethod);
         }
+        sendPing();
     }
 
     // onStart() is called on application start up

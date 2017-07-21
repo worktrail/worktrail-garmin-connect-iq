@@ -3,6 +3,13 @@ using Toybox.WatchUi as Ui;
 using Toybox.System as Sys;
 using Toybox.Communications as Comm;
 
+
+var listener = new CommListener();
+
+function sendPing() {
+    Comm.transmit({"action" => "ping"}, null, listener);
+}
+
 class CommListener extends Comm.ConnectionListener {
     function initialize() {
         Comm.ConnectionListener.initialize();
@@ -51,9 +58,9 @@ class CommInputDelegate extends Ui.BehaviorDelegate {
         return true;
     }
     
-        // Detect Menu button input
-    function onKey(keyEvent) {
-        System.println(keyEvent.getKey()); // e.g. KEY_MENU = 7
+    // Detect Menu button input
+    function onKey(event) {
+        System.println(event.getKey()); // e.g. KEY_MENU = 7
         if (event.getKey() == Ui.KEY_ENTER) {
             if (status.isCurrent) {
                 if (status.isWorking && !status.taskIsBreak) {
@@ -61,22 +68,49 @@ class CommInputDelegate extends Ui.BehaviorDelegate {
                 } else {
                     Comm.transmit({"action" => "start"}, null, listener);
                 }
+                return true;
+            }
+        }
+        if (Toybox.WatchUi has :EXTENDED_KEYS) {
+            if (event.getKey() == Ui.KEY_LAP) {
+                return doPause();
             }
         }
     }
-
-    function onTap(event) {
-        System.println("Tapped.");
-        Ui.requestUpdate();
-    }
     
-    function onBack() {
-        System.println("Back pressed.");
+    function doPause() {
         if (status.isCurrent) {
             if (status.isWorking) {
                 Comm.transmit({"action" => "start_break"}, null, listener);
                 return true;
             }
+        }
+        return false;
+    }
+
+
+    function onTap(event) {
+        System.println("Tapped.");
+        Ui.requestUpdate();
+        if (!status.isCurrent) {
+            sendPing();
+            return true;
+        } else {
+            if (status.isWorking) {
+                
+            }
+        }
+        return false;
+    }
+    
+    function onSelectable(event) {
+        System.println("selectable: " + event.getInstance());
+    }
+    
+    function onBack() {
+        System.println("Back pressed.");
+        if (doPause()) {
+            return true;
         }
         var dialog = new Ui.Confirmation("Quit App?");
         Ui.pushView(dialog, new ConfirmationDialogDelegate(), Ui.SLIDE_IMMEDIATE);
