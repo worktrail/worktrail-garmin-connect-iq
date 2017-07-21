@@ -7,6 +7,7 @@ using Toybox.System as Sys;
 class WorkTrailView extends Ui.View {
     var screenShape;
     var bitmapLogo;
+    var isTouchScreen;
 
     function initialize() {
         View.initialize();
@@ -19,6 +20,7 @@ class WorkTrailView extends Ui.View {
 
     function onLayout(dc) {
         screenShape = Sys.getDeviceSettings().screenShape;
+        isTouchScreen = Sys.getDeviceSettings().isTouchScreen;
     }
 
     function drawIntroPage(dc) {
@@ -60,13 +62,23 @@ class WorkTrailView extends Ui.View {
             drawWithoutLogo(dc);
             //drawHorizontalVariant(dc);
             //drawVerticalVariant(dc);
-            dc.setColor(Gfx.COLOR_BLUE, Gfx.COLOR_TRANSPARENT);
-            dc.drawText(0, dc.getHeight()-dc.getFontHeight(Gfx.FONT_TINY), Gfx.FONT_XTINY, "https://worktrail.net/", Gfx.TEXT_JUSTIFY_LEFT);
         }
     }
     
     function drawWithoutLogo(dc) {
-        drawWorkStatus(dc, 0, 0, dc.getWidth(), dc.getHeight());
+        var height = dc.getHeight();
+        dc.setColor(Gfx.COLOR_BLUE, Gfx.COLOR_TRANSPARENT);
+        if (screenShape == System.SCREEN_SHAPE_RECTANGLE) {
+            height = height - dc.getFontHeight(Gfx.FONT_TINY);
+            dc.drawText(0, height, Gfx.FONT_XTINY, "https://worktrail.net/", Gfx.TEXT_JUSTIFY_LEFT);
+        } else {
+            height = height - dc.getFontHeight(Gfx.FONT_TINY) - 30;
+            dc.drawText(dc.getWidth()/2, height, Gfx.FONT_XTINY, "https://worktrail.net/", Gfx.TEXT_JUSTIFY_CENTER);
+        }
+        var paddingTop = 20;
+
+        drawWorkStatus(dc, 0, paddingTop, dc.getWidth(), height-paddingTop);
+        
     }
     
     /// Logo on the left
@@ -91,37 +103,55 @@ class WorkTrailView extends Ui.View {
         var statusColor;
         var statusMsg;
         var actionButton;
+        var helpText;
         
         if (!status.isWorking) {
             statusColor = Gfx.COLOR_RED;
             statusMsg = "Signed Out";
             actionButton = "Start";
+            helpText = "ENTER to start work.";
         } else if (status.taskIsBreak) {
             statusColor = Gfx.COLOR_BLUE;
             statusMsg = "Break";
             actionButton = "Resume";
+            helpText = "ENTER to resume work.";
         } else {
             statusColor = Gfx.COLOR_GREEN;
             statusMsg = "Working";
             actionButton = "Stop";
+            helpText = "LAP to start break.";
         }
         
 
+        var statusLocY = y;
         dc.setColor(statusColor, Gfx.COLOR_TRANSPARENT);
         dc.drawText(x + width / 2, y,  Gfx.FONT_LARGE, statusMsg, Gfx.TEXT_JUSTIFY_CENTER);
         
         dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
         if (status.taskName != null) {
-            dc.drawText(x + width / 2, y+30, Gfx.FONT_SMALL, status.taskName, Gfx.TEXT_JUSTIFY_CENTER);
+            var taskName = status.taskName;
+            if (taskName == "") { taskName = "New Work"; }
+            dc.drawText(x + width / 2, y+30, Gfx.FONT_SMALL, taskName, Gfx.TEXT_JUSTIFY_CENTER);
         }
         
-        dc.setColor( 0xff55ff, Gfx.COLOR_RED);
-        var dimensions = dc.getTextDimensions(actionButton, Gfx.FONT_MEDIUM);
-        var ypos = y + 80;
-        dc.fillRoundedRectangle(x + width/2 - dimensions[0]/2 - 20, ypos - 10, dimensions[0] + 40, dimensions[1]+20, 5);
-        dc.setColor(Gfx.COLOR_BLACK, 0xff55ff);
-        dc.drawText(x + width / 2, ypos, Gfx.FONT_MEDIUM, actionButton, Gfx.TEXT_JUSTIFY_CENTER);
         
+        if (isTouchScreen) {
+            dc.setColor( 0xff55ff, Gfx.COLOR_RED);
+            var dimensions = dc.getTextDimensions(actionButton, Gfx.FONT_MEDIUM);
+            var ypos = y + 80;
+            dc.fillRoundedRectangle(x + width/2 - dimensions[0]/2 - 20, ypos - 10, dimensions[0] + 40, dimensions[1]+20, 5);
+            dc.setColor(Gfx.COLOR_BLACK, 0xff55ff);
+            dc.drawText(x + width / 2, ypos, Gfx.FONT_MEDIUM, actionButton, Gfx.TEXT_JUSTIFY_CENTER);
+        } else {
+            var ypos = y+80;
+            dc.setColor(Gfx.COLOR_LT_GRAY, Gfx.COLOR_TRANSPARENT);
+            dc.drawText(x+width/2, height-1.2*dc.getFontHeight(Gfx.FONT_TINY)+y, Gfx.FONT_TINY, helpText, Gfx.TEXT_JUSTIFY_CENTER);
+            if (status.taskName == null) {
+                bitmapLogo.locX = width/2-bitmapLogo.width/2+x;
+                bitmapLogo.locY = statusLocY + dc.getFontHeight(Gfx.FONT_LARGE) * 1.1;
+                bitmapLogo.draw(dc);
+            }
+        }
         
     }
 
