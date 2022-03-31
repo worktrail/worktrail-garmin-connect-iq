@@ -19,6 +19,7 @@
             <iq:product id="fr920xt"/>
             <iq:product id="fenix3_hr"/>
             <iq:product id="fr935"/>
+            <iq:product id="venu2s"/>
         </iq:products>
         <iq:permissions>
             <iq:uses-permission id="Communications"/>
