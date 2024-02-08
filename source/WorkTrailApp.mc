@@ -30,13 +30,8 @@ class WorkTrailApp extends App.AppBase {
     function initialize() {
         App.AppBase.initialize();
 
-        mailMethod = method(:onMail);
-        phoneMethod = method(:onPhone);
-        if(Comm has :registerForPhoneAppMessages) {
-            Comm.registerForPhoneAppMessages(phoneMethod);
-        } else {
-            Comm.setMailboxListener(mailMethod);
-        }
+        phoneMethod = method(:onPhone) as Comm.PhoneMessageCallback;
+        Comm.registerForPhoneAppMessages(phoneMethod);
         sendPing();
     }
 
@@ -51,25 +46,6 @@ class WorkTrailApp extends App.AppBase {
     // Return the initial view of your application here
     function getInitialView() {
         return [new WorkTrailView(), new CommInputDelegate()];
-    }
-
-    function onMail(mailIter) {
-        var mail;
-
-        mail = mailIter.next();
-
-        while(mail != null) {
-            var i;
-            for(i = (stringsSize - 1); i > 0; i -= 1) {
-                strings[i] = strings[i-1];
-            }
-            strings[0] = mail.toString();
-            page = 1;
-            mail = mailIter.next();
-        }
-
-        Comm.emptyMailbox();
-        Ui.requestUpdate();
     }
 
     function onPhone(msg) {

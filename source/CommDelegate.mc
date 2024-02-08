@@ -36,6 +36,7 @@ class ConfirmationDialogDelegate extends Ui.ConfirmationDelegate {
             System.println("User wants to quit.");
             Ui.popView(Ui.SLIDE_RIGHT);
         }
+        return true;
     }
 }
 
@@ -60,7 +61,7 @@ class CommInputDelegate extends Ui.BehaviorDelegate {
     
     // Detect Menu button input
     function onKey(event) {
-        System.println(event.getKey()); // e.g. KEY_MENU = 7
+        System.println("key: " + event.getKey()); // e.g. KEY_MENU = 7
         if (event.getKey() == Ui.KEY_ENTER) {
             if (status.isCurrent) {
                 if (status.isWorking && !status.taskIsBreak) {
@@ -77,6 +78,7 @@ class CommInputDelegate extends Ui.BehaviorDelegate {
                 return false;
             }
         }
+        return false;
     }
     
     function doPause() {
@@ -106,6 +108,7 @@ class CommInputDelegate extends Ui.BehaviorDelegate {
     
     function onSelectable(event) {
         System.println("selectable: " + event.getInstance());
+        return true;
     }
     
     function onBack() {
