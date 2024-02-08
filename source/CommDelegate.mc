@@ -73,7 +73,8 @@ class CommInputDelegate extends Ui.BehaviorDelegate {
         }
         if (Toybox.WatchUi has :EXTENDED_KEYS) {
             if (event.getKey() == Ui.KEY_LAP) {
-                return doPause();
+                //return doPause();
+                return false;
             }
         }
     }
